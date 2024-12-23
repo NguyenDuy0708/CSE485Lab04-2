@@ -51,7 +51,7 @@ class OrderController extends Controller
         $products = Product::all(); 
         $customers = Customer::all();
 
-        return view('orders.edit', compact('orders', 'products', 'customers'));
+        return view('orders.edit', compact('order', 'products', 'customers'));
     }
     public function update(Request $request, Order $order)
     {
@@ -59,19 +59,19 @@ class OrderController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'order_date' => 'required|date',
             'status' => 'required|string|max:255',
-        ]);
-
-        $order->update([
-            'customer_id' => $request->customer_id,
-            'order_date' => $request->order_date,
-            'status' => $request->status,
             'products' => 'required|array',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
         ]);
-
-        $order->orderDetails()->delete(); 
-
+        
+        $order->update([
+            'customer_id' => $request->customer_id,
+            'order_date' => $request->order_date,
+            'status' => $request->status,
+        ]);
+        
+        $order->order_details()->delete();
+        
         foreach ($request->products as $product) {
             Order_detail::create([
                 'order_id' => $order->id,
@@ -84,13 +84,10 @@ class OrderController extends Controller
     }
     public function destroy(Order $order)
     {
+        $order->order_details()->delete();
         $order->delete();
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được xóa thành công!');
     }
 
-    public function history($customerId)
-{
-    $customer = Customer::with('orders.order_details.product')->findOrFail($customerId);
-    return view('orders.history', compact('customer'));
-}
+    
 }

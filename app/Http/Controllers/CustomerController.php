@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Order;
 class CustomerController extends Controller
 {
     public function index()
@@ -45,5 +46,11 @@ class CustomerController extends Controller
     {
         $customer->delete();
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
+    }
+    public function history($id)
+    {
+        $customer = Customer::findOrFail($id);
+        $orders = Order::where ('customer_id', $id)->get();
+        return view('orders.history', compact('customer', 'orders'));
     }
 }
