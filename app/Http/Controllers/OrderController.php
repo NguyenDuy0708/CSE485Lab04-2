@@ -87,4 +87,10 @@ class OrderController extends Controller
         $order->delete();
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được xóa thành công!');
     }
+
+    public function history($customerId)
+{
+    $customer = Customer::with('orders.order_details.product')->findOrFail($customerId);
+    return view('orders.history', compact('customer'));
+}
 }
