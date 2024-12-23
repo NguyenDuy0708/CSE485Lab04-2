@@ -65,6 +65,9 @@ class OrderController extends Controller
             'customer_id' => $request->customer_id,
             'order_date' => $request->order_date,
             'status' => $request->status,
+            'products' => 'required|array',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
         ]);
 
         $order->orderDetails()->delete(); 
