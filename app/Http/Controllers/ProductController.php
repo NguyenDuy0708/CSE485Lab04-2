@@ -4,51 +4,103 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+
 class ProductController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function home()
     {
-        $products = Product::all();
-        return view('products.index', compact('products'));
+        return view('home');
     }
+public function index()
+{
+    // Sắp xếp theo ID giảm dần
+    $products = Product::orderBy('id', 'desc')->paginate(10);
 
+    // Lấy chỉ số của bản ghi đầu tiên (trong trường hợp bạn cần hiển thị)
+    $firstItem = $products->firstItem();
+
+    return view('products.index', compact('products'));
+}
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         return view('products.create');
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-            'quantity' => 'required'
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
         ]);
-
         Product::create($request->all());
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
 
-    public function edit(Product $product)
+    /**
+     * Display the specified resource.
+     */
+
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
     {
-        return view('products.edit', compact('product'));
+        $product = Product::findOrFail($id); // Lấy sản phẩm theo ID
+        return view('products.edit', compact('product')); // Truyền biến $product vào view
     }
 
-    public function update(Request $request, Product $product)
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
     {
+        $products = Product::findOrFail($id);
         $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-            'quantity' => 'required'
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
         ]);
-        $product->update($request->all());
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        $products= Product::findOrFail($id);
+        $products->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'quantity' => $request->quantity,
+        ]);
+        return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
-    public function destroy(Product $product)
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
     {
-        $product->delete();
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        $products = Product::findOrFail($id);
+        $products->delete();
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully!');
     }
+
+    public function confirmDelete($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('products.delete', compact('product'));
+    }
+
+
 }

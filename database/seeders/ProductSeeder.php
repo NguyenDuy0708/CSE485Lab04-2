@@ -2,42 +2,26 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Product;
+use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
+
 class ProductSeeder extends Seeder
 {
-
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $products = [
-            [
-                'name' => 'Bánh mi',
-                'description' => 'Dai ngon',
-                'price' => 100,
-                'quantity' => 10
-            ],
-            [
-                'name' => 'Mì tôm',
-                'description' => 'đậm đà',
-                'price' => 200,
-                'quantity' => 20
-            ],
-            [
-                'name' => 'Bộ bàn ghế',
-                'description' => 'Chắc chắn',
-                'price' => 300,
-                'quantity' => 30
-            ],
-            [
-                'name' => 'Product 4',
-                'description' => 'Description 4',
-                'price' => 400,
-                'quantity' => 40
-            ]
-            ];          
-        foreach ($products as $product) {
-            Product::create($product);
+        $faker = Faker::create();
+
+        foreach (range(1, 100) as $index) {
+            DB::table('products')->insert([
+                'name' => $faker->word,
+                'description' => $faker->sentence(10),
+                'price' => $faker->randomFloat(2, 10, 1000),
+                'quantity' => $faker->numberBetween(1, 100),
+            ]);
         }
     }
 }

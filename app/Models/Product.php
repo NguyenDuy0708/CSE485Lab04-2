@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = ['name', 'description', 'price', 'quantity'];
-    public function order_details()
+    public function orders()
     {
-        return $this->hasMany(Order_detail::class);
+        return $this->belongsToMany(Order::class, 'order_details')->withPivot('quantity');
     }
 }
