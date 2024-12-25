@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with('customer')->get();
+        $orders = Order::with('customer', 'order_details.product')->get();
         return view('orders.index', compact('orders'));
     }
 
@@ -36,6 +36,7 @@ class OrderController extends Controller
             'customer_id' => $request->customer_id,
             'order_date' => $request->order_date,
             'status' => $request->status,
+
         ]);
         foreach ($request->products as $product) {
             Order_detail::create([
